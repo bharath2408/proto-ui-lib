@@ -1,0 +1,4 @@
+{
+  "requiredPackages": ["clsx", "tailwind-merge", "class-variance-authority"],
+  "optionalPackages": ["@radix-ui/react-slot", "@radix-ui/react-icons"]
+}
