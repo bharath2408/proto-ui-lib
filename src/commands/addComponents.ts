@@ -28,7 +28,11 @@ export async function addComponents(
 
     // Define paths
     const templatesRoot = path.join(__dirname, "../src/templates/components");
-    const componentTemplateDir = path.join(templatesRoot, component);
+    const componentTemplateDir = path.join(
+      templatesRoot,
+      "ui",
+      componentConfig.files[0].file_name
+    );
 
     const dependenciesToInstall = componentConfig.dependencies || [];
     if (dependenciesToInstall.length > 0) {
@@ -72,7 +76,7 @@ export async function addComponents(
 
       // Create directory and copy file
       await fs.ensureDir(targetPath);
-      const source = path.join(componentTemplateDir, fileConfig.file_name);
+      const source = path.join(componentTemplateDir);
 
       if (!(await fs.pathExists(source))) {
         spinner.fail(

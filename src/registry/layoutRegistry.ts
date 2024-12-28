@@ -6,14 +6,7 @@ export const LAYOUTREGISTRY: Record<string, LayoutConfig> = {
     type: "components:layout",
     providers: {
       simple: {
-        components: [
-          { file_name: "page.tsx", path: "/" },
-          { file_name: "button.tsx", path: "/_components" },
-          { file_name: "input.tsx", path: "/_components" },
-          { file_name: "checkbox.tsx", path: "/_components" },
-          { file_name: "label.tsx", path: "/_components" },
-          { file_name: "card.tsx", path: "/_components" },
-        ],
+        components: [{ file_name: "page.tsx", path: "/" }],
         dependencies: [
           "@radix-ui/react-slot@latest",
           "class-variance-authority@latest",

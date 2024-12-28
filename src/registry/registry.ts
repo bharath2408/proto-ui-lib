@@ -48,6 +48,6 @@ export const REGISTRY: Record<string, ComponentConfig> = {
       "@radix-ui/react-label@latest",
       "class-variance-authority@latest",
     ],
-    files: [{ file_name: "checkbox.tsx", path: "/components/ui" }],
+    files: [{ file_name: "label.tsx", path: "/components/ui" }],
   },
 };

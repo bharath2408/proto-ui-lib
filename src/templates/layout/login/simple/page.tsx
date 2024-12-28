@@ -1,9 +1,5 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { Button } from "./_components/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,10 +7,15 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "./_components/card";
-import { Checkbox } from "./_components/checkbox";
-import { Input } from "./_components/input";
-import { Label } from "./_components/label";
+} from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface LoginFormData {
   email: string;
