@@ -57,4 +57,11 @@ export const REGISTRY: Record<string, ComponentConfig> = {
     ],
     files: [{ file_name: "label.tsx", path: "/components/ui" }],
   },
+  sidebar: {
+    name: "sidebar",
+    type: "components:ui",
+    dependenciesComponent: [],
+    dependencies: ["lucide-react@latest", "class-variance-authority"],
+    files: [{ file_name: "sidebar.tsx", path: "/components/ui" }],
+  },
 };
