@@ -38,10 +38,9 @@ const sidebarVariants = cva(
   {
     variants: {
       variant: {
-        default: "text-white",
-        compact: "text-gray-300 text-sm",
+        default: "bg-slate-700 text-white",
         modern: "text-gray-100 shadow-lg border-r border-gray-700",
-        transparent: "bg-opacity-40 backdrop-blur-lg text-gray-100 shadow-lg",
+        transparent: "bg-white/30 backdrop-blur-sm text-gray-100 shadow-lg",
       },
     },
     defaultVariants: {
@@ -70,10 +69,14 @@ interface SidebarProps
   extends React.HTMLAttributes<HTMLElement>,
     VariantProps<typeof sidebarVariants> {
   expand?: boolean;
+  buttonClassName?: string;
 }
 
 const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
-  ({ className, variant, children, expand = false, ...props }, ref) => {
+  (
+    { className, buttonClassName, variant, children, expand = false, ...props },
+    ref
+  ) => {
     const [isCollapsed, setIsCollapsed] = React.useState(false);
     const [isMobileOpen, setIsMobileOpen] = React.useState(false);
 
@@ -114,24 +117,28 @@ const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
         <aside
           ref={ref}
           className={cn(
-            sidebarVariants({ variant }),
-            className,
+            sidebarVariants({ variant, className }),
             // Desktop styles
-            "fixed top-0 left-0 h-screen p-4",
-            isCollapsed ? "lg:w-24" : "lg:w-64",
+            "h-screen p-4",
+            isCollapsed
+              ? "lg:w-24 translate-x-0"
+              : "lg:w-64 -translate-x-full lg:translate-x-0",
             // Mobile styles
             "w-64 z-40",
             isMobileOpen
               ? "translate-x-0"
               : "-translate-x-full lg:translate-x-0",
-            "transition-transform duration-300 ease-in-out"
+            "transition-all duration-300 ease-in-out"
           )}
           {...props}
         >
           {expand && (
             <button
               onClick={toggleCollapse}
-              className="absolute -right-4 top-3 bg-gray-700 p-2 rounded-full hover:bg-gray-600 hidden lg:block"
+              className={cn(
+                "absolute -right-4 top-3 bg-gray-700 p-2 rounded-full hover:bg-gray-600 hidden lg:block",
+                buttonClassName
+              )}
               aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               {isCollapsed ? (
@@ -204,9 +211,8 @@ const SidebarItem = React.forwardRef<HTMLDivElement, SidebarItemProps>(
     const button = (
       <button
         className={cn(
-          "flex items-center justify-between w-full rounded transition-colors duration-200",
-          buttonClassName || "hover:bg-gray-800",
-          isCollapsed ? "lg:p-5 lg:justify-center lg:rounded-full" : "px-4 py-3"
+          "flex items-center justify-between w-full rounded transition-colors duration-200 px-4 py-3",
+          buttonClassName || "hover:bg-gray-800"
         )}
         onClick={handleClick}
       >
@@ -309,9 +315,20 @@ const SidebarFooter = React.forwardRef<
 });
 SidebarFooter.displayName = "SidebarFooter";
 
+const SidebarDivider = React.forwardRef<
+  HTMLHRElement,
+  React.HTMLAttributes<HTMLHRElement>
+>(({ className, ...props }, ref) => {
+  return (
+    <hr ref={ref} className={cn("my-2 border-white", className)} {...props} />
+  );
+});
+SidebarDivider.displayName = "SidebarDivider";
+
 export {
   Sidebar,
   SidebarContent,
+  SidebarDivider,
   SidebarFooter,
   SidebarHeader,
   SidebarItem,
