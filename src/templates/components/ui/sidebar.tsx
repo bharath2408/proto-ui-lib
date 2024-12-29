@@ -5,21 +5,36 @@ import { cva, type VariantProps } from "class-variance-authority";
 import {
   ChevronDown,
   ChevronRight,
+  Menu,
   PanelLeft,
   PanelLeftClose,
+  X,
 } from "lucide-react";
-import React, { useState } from "react";
+import * as React from "react";
 
-type SidebarItem = {
-  id: string;
-  label: string;
-  icon?: React.ReactNode;
-  href?: string;
-  children?: SidebarItem[];
-};
+// Context
+interface SidebarContextValue {
+  isCollapsed: boolean;
+  isMobileOpen: boolean;
+  toggleCollapse: () => void;
+  toggleMobileMenu: () => void;
+}
 
+const SidebarContext = React.createContext<SidebarContextValue | undefined>(
+  undefined
+);
+
+function useSidebarContext() {
+  const context = React.useContext(SidebarContext);
+  if (!context) {
+    throw new Error("useSidebarContext must be used within a Sidebar");
+  }
+  return context;
+}
+
+// Sidebar variants
 const sidebarVariants = cva(
-  "h-screen p-4 flex flex-col space-y-4 transition-all duration-300",
+  "relative flex flex-col space-y-4 transition-all duration-300",
   {
     variants: {
       variant: {
@@ -35,113 +50,273 @@ const sidebarVariants = cva(
   }
 );
 
-type SidebarProps = {
-  items: SidebarItem[];
-  className?: string;
-  variant?: VariantProps<typeof sidebarVariants>["variant"];
-  buttonClassName?: string;
-  footer?: React.ReactNode;
-  expand?: boolean;
-};
-
-const Sidebar: React.FC<SidebarProps> = ({
-  items,
-  className = "bg-gray-700",
-  variant = "default",
-  buttonClassName = "hover:bg-gray-800",
-  footer,
-  expand = false,
-}) => {
-  const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
-  const [isCollapsed, setIsCollapsed] = useState(false);
-
-  const toggleItem = (id: string) => {
-    setExpandedItems((prev) =>
-      prev.has(id)
-        ? new Set([...prev].filter((item) => item !== id))
-        : new Set([...prev, id])
-    );
-  };
-
-  const toggleCollapse = () => {
-    setIsCollapsed(!isCollapsed);
-  };
+// MobileToggle component
+const MobileToggle = () => {
+  const { toggleMobileMenu, isMobileOpen } = useSidebarContext();
 
   return (
-    <aside
-      className={cn(
-        sidebarVariants({ variant }),
-        className,
-        isCollapsed ? "w-24" : "w-64",
-        "relative"
-      )}
+    <button
+      onClick={toggleMobileMenu}
+      className="lg:hidden fixed top-4 right-4 z-50 bg-gray-800 p-2 rounded-lg"
+      aria-label={isMobileOpen ? "Close menu" : "Open menu"}
     >
-      {/* Collapse Toggle Button */}
-      {expand && (
-        <button
-          onClick={toggleCollapse}
-          className={cn(
-            "absolute -right-4 top-3 bg-gray-700 p-2 rounded-full hover:bg-gray-600"
-          )}
-        >
-          {isCollapsed ? (
-            <PanelLeft className="w-6 h-6" />
-          ) : (
-            <PanelLeftClose className="w-6 h-6" />
-          )}
-        </button>
-      )}
-      {/* Sidebar Items */}
-      <div className="flex-1">
-        {items.map((item) => (
-          <div key={item.id}>
-            <button
-              className={cn(
-                "flex items-center justify-between w-full px-2 py-3 rounded",
-                buttonClassName,
-                isCollapsed && "p-5 justify-center rounded-full"
-              )}
-              onClick={() => item.children && toggleItem(item.id)}
-            >
-              <span className="flex items-center space-x-2">
-                {item.icon && <span>{item.icon}</span>}
-                {!isCollapsed && <span>{item.label}</span>}
-              </span>
-              {!isCollapsed && item.children && (
-                <span>
-                  {expandedItems.has(item.id) ? (
-                    <ChevronDown className="w-4 h-4" />
-                  ) : (
-                    <ChevronRight className="w-4 h-4" />
-                  )}
-                </span>
-              )}
-            </button>
-            {!isCollapsed && item.children && expandedItems.has(item.id) && (
-              <div className={cn("ml-6 mt-2 space-y-2")}>
-                {item.children.map((child) => (
-                  <a
-                    key={child.id}
-                    href={child.href}
-                    className={cn(
-                      "block px-4 py-2 hover:bg-gray-700 rounded",
-                      buttonClassName
-                    )}
-                  >
-                    {child.label}
-                  </a>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-      {/* Footer Section */}
-      {footer && (
-        <div className={cn("mt-4", isCollapsed && "hidden")}>{footer}</div>
-      )}
-    </aside>
+      {isMobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+    </button>
   );
 };
 
-export default Sidebar;
+// Sidebar component
+interface SidebarProps
+  extends React.HTMLAttributes<HTMLElement>,
+    VariantProps<typeof sidebarVariants> {
+  expand?: boolean;
+}
+
+const Sidebar = React.forwardRef<HTMLElement, SidebarProps>(
+  ({ className, variant, children, expand = false, ...props }, ref) => {
+    const [isCollapsed, setIsCollapsed] = React.useState(false);
+    const [isMobileOpen, setIsMobileOpen] = React.useState(false);
+
+    const toggleCollapse = React.useCallback(() => {
+      setIsCollapsed((prev) => !prev);
+    }, []);
+
+    const toggleMobileMenu = React.useCallback(() => {
+      setIsMobileOpen((prev) => !prev);
+    }, []);
+
+    // Close mobile menu on wider screens
+    React.useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth >= 1024) {
+          setIsMobileOpen(false);
+        }
+      };
+
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    return (
+      <SidebarContext.Provider
+        value={{ isCollapsed, isMobileOpen, toggleCollapse, toggleMobileMenu }}
+      >
+        <MobileToggle />
+
+        {/* Mobile overlay */}
+        {isMobileOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+            onClick={toggleMobileMenu}
+          />
+        )}
+
+        <aside
+          ref={ref}
+          className={cn(
+            sidebarVariants({ variant }),
+            className,
+            // Desktop styles
+            "fixed top-0 left-0 h-screen p-4",
+            isCollapsed ? "lg:w-24" : "lg:w-64",
+            // Mobile styles
+            "w-64 z-40",
+            isMobileOpen
+              ? "translate-x-0"
+              : "-translate-x-full lg:translate-x-0",
+            "transition-transform duration-300 ease-in-out"
+          )}
+          {...props}
+        >
+          {expand && (
+            <button
+              onClick={toggleCollapse}
+              className="absolute -right-4 top-3 bg-gray-700 p-2 rounded-full hover:bg-gray-600 hidden lg:block"
+              aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {isCollapsed ? (
+                <PanelLeft className="w-6 h-6" />
+              ) : (
+                <PanelLeftClose className="w-6 h-6" />
+              )}
+            </button>
+          )}
+          {children}
+        </aside>
+      </SidebarContext.Provider>
+    );
+  }
+);
+Sidebar.displayName = "Sidebar";
+
+const SidebarHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => {
+  const { isCollapsed } = useSidebarContext();
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "flex items-center mb-6",
+        isCollapsed && window.innerWidth >= 1024 ? "justify-center" : "px-2",
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  );
+});
+SidebarHeader.displayName = "SidebarHeader";
+
+// SidebarItem component
+interface SidebarItemProps extends React.HTMLAttributes<HTMLDivElement> {
+  icon?: React.ReactNode;
+  href?: string;
+  label: string;
+  buttonClassName?: string;
+}
+
+const SidebarItem = React.forwardRef<HTMLDivElement, SidebarItemProps>(
+  (
+    { className, icon, label, href, buttonClassName, children, ...props },
+    ref
+  ) => {
+    const { isCollapsed, toggleMobileMenu } = useSidebarContext();
+    const [isExpanded, setIsExpanded] = React.useState(false);
+
+    const hasChildren = React.Children.count(children) > 0;
+
+    const handleClick = (e: React.MouseEvent) => {
+      if (hasChildren) {
+        e.preventDefault();
+        setIsExpanded((prev) => !prev);
+      } else if (href) {
+        // Close mobile menu when navigating on mobile
+        if (window.innerWidth < 1024) {
+          toggleMobileMenu();
+        }
+      }
+    };
+
+    const button = (
+      <button
+        className={cn(
+          "flex items-center justify-between w-full rounded transition-colors duration-200",
+          buttonClassName || "hover:bg-gray-800",
+          isCollapsed ? "lg:p-5 lg:justify-center lg:rounded-full" : "px-4 py-3"
+        )}
+        onClick={handleClick}
+      >
+        <span className="flex items-center space-x-2">
+          {icon && <span>{icon}</span>}
+          {(!isCollapsed || window.innerWidth < 1024) && <span>{label}</span>}
+        </span>
+        {(!isCollapsed || window.innerWidth < 1024) && hasChildren && (
+          <span>
+            {isExpanded ? (
+              <ChevronDown className="w-4 h-4" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </span>
+        )}
+      </button>
+    );
+
+    return (
+      <div ref={ref} className={cn("", className)} {...props}>
+        {href && !hasChildren ? <a href={href}>{button}</a> : button}
+        {(!isCollapsed || window.innerWidth < 1024) &&
+          hasChildren &&
+          isExpanded && (
+            <div className={cn("ml-4 mt-1 space-y-1")}>{children}</div>
+          )}
+      </div>
+    );
+  }
+);
+SidebarItem.displayName = "SidebarItem";
+
+// SidebarSubItem component
+interface SidebarSubItemProps extends React.HTMLAttributes<HTMLAnchorElement> {
+  href: string;
+  label: string;
+  icon?: React.ReactNode;
+}
+
+const SidebarSubItem = React.forwardRef<HTMLAnchorElement, SidebarSubItemProps>(
+  ({ className, href, label, icon, ...props }, ref) => {
+    const { isCollapsed, toggleMobileMenu } = useSidebarContext();
+
+    if (isCollapsed && window.innerWidth >= 1024) return null;
+
+    const handleClick = () => {
+      // Close mobile menu when navigating on mobile
+      if (window.innerWidth < 1024) {
+        toggleMobileMenu();
+      }
+    };
+
+    return (
+      <a
+        ref={ref}
+        href={href}
+        onClick={handleClick}
+        className={cn(
+          "flex items-center space-x-2 text-sm text-gray-300 hover:text-white rounded-md px-3 py-2 hover:bg-gray-800/50",
+          className
+        )}
+        {...props}
+      >
+        {icon && <span>{icon}</span>}
+        <span>{label}</span>
+      </a>
+    );
+  }
+);
+SidebarSubItem.displayName = "SidebarSubItem";
+
+// SidebarContent component
+const SidebarContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div ref={ref} className={cn("flex-1", className)} {...props} />
+));
+SidebarContent.displayName = "SidebarContent";
+
+// SidebarFooter component
+const SidebarFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => {
+  const { isCollapsed } = useSidebarContext();
+
+  return (
+    <div
+      ref={ref}
+      className={cn(
+        "mt-4",
+        isCollapsed && window.innerWidth >= 1024 && "hidden",
+        className
+      )}
+      {...props}
+    />
+  );
+});
+SidebarFooter.displayName = "SidebarFooter";
+
+export {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarItem,
+  SidebarSubItem,
+  type SidebarItemProps,
+  type SidebarProps,
+  type SidebarSubItemProps,
+};
