@@ -23,6 +23,24 @@ export async function addComponents(
       return logger.error(`Component "${component}" not found in registry`);
     }
 
+    if (
+      Array.isArray(componentConfig.dependenciesComponent) &&
+      componentConfig.dependenciesComponent.length > 0
+    ) {
+      spinner.info(`Installing dependent components for ${component}...`);
+      for (const depComponent of componentConfig.dependenciesComponent) {
+        try {
+          await addComponents(depComponent, options);
+        } catch (err) {
+          spinner.fail(`Failed to install dependent component ${depComponent}`);
+          if (err instanceof Error) {
+            logger.error(err.message);
+          }
+          throw err;
+        }
+      }
+    }
+
     // Get project config
     const config = await getConfig();
 

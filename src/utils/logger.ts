@@ -1,4 +1,5 @@
 // src/utils/logger.ts
+import { addComponents } from "@/commands/addComponents";
 import { execa } from "execa";
 import kleur from "kleur";
 import ora from "ora";
@@ -20,6 +21,11 @@ export const logger = {
     return ora(message);
   },
   logPackageInstallation: async (packages: string[]) => {
+    if (!Array.isArray(packages) || packages.length === 0) {
+      logger.info("No dependencies to handle.");
+      return;
+    }
+
     for (const pkg of packages) {
       const coloredPkg = kleur.green(pkg);
       const packageSpinner = ora(`Installing ${coloredPkg}`).start();

@@ -30,6 +30,8 @@ export async function init(options: { yes?: boolean }) {
 
       const sourceFilePath = path.join(__dirname, "../src/lib/utils.ts"); // Path to the source file
       const destinationFilePath = path.join(libDir, "utils.ts"); // Path to the destination file
+      const schemaFilePath = path.join(__dirname, "../src/lib/schemas.ts");
+      const destinationschemasFilePath = path.join(libDir, "schemas.ts");
       const jsonFilePath = path.join(
         __dirname,
         "../src/templates/myui.config.json"
@@ -38,7 +40,7 @@ export async function init(options: { yes?: boolean }) {
       const destinationJsonPath = path.join(baseDir, "myui.config.json");
 
       await fs.copyFile(jsonFilePath, destinationJsonPath);
-
+      await fs.copyFile(schemaFilePath, destinationschemasFilePath);
       // Copy the utils.ts file from source to destination
       await fs.copyFile(sourceFilePath, destinationFilePath);
 
@@ -72,7 +74,10 @@ export async function init(options: { yes?: boolean }) {
       // Copy the utils.ts file from the source directory to the lib directory
       const sourceFilePath = path.join(__dirname, "../src/lib/utils.ts"); // Path to the source file
       const destinationFilePath = path.join(libDir, "utils.ts"); // Path to the destination file
+      const schemaFilePath = path.join(__dirname, "../src/lib/schemas.ts");
+      const destinationschemasFilePath = path.join(libDir, "schemas.ts");
 
+      logger.info(schemaFilePath);
       const jsonFilePath = path.join(
         __dirname,
         "../src/templates/myui.config.json"
@@ -81,7 +86,7 @@ export async function init(options: { yes?: boolean }) {
       const destinationJsonPath = path.join(baseDir, "myui.config.json");
 
       await fs.copyFile(jsonFilePath, destinationJsonPath);
-
+      await fs.copyFile(schemaFilePath, destinationschemasFilePath);
       await fs.copyFile(sourceFilePath, destinationFilePath);
 
       // Install default dependencies

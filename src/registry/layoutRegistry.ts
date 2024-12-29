@@ -7,6 +7,7 @@ export const LAYOUTREGISTRY: Record<string, LayoutConfig> = {
     providers: {
       simple: {
         components: [{ file_name: "page.tsx", path: "/" }],
+        dependenciesComponent: ["button", "input"],
         dependencies: [
           "@radix-ui/react-slot@latest",
           "class-variance-authority@latest",
@@ -20,11 +21,8 @@ export const LAYOUTREGISTRY: Record<string, LayoutConfig> = {
         ],
       },
       microsoft: {
-        components: [
-          { file_name: "page.tsx", path: "/" },
-          { file_name: "button.tsx", path: "/_components" },
-          { file_name: "input.tsx", path: "/_components" },
-        ],
+        components: [{ file_name: "page.tsx", path: "/" }],
+        dependenciesComponent: ["button", "input"],
         dependencies: [
           "@radix-ui/react-slot@latest",
           "lucide-react@latest",

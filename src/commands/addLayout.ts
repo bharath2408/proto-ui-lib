@@ -5,6 +5,7 @@ import { execa } from "execa";
 import fs from "fs-extra";
 import path from "path";
 import { fileURLToPath } from "url";
+import { addComponents } from "./addComponents";
 
 type AddType = "components" | "layout";
 
@@ -56,6 +57,19 @@ async function getLayoutPath(appDir: string, layoutName: string) {
   return path.join(appDir, targetPath);
 }
 
+async function handleComponentDependencies(components: string[]) {
+  if (!Array.isArray(components) || components.length === 0) {
+    logger.info("No dependencies to handle.");
+    return;
+  }
+
+  const options = { yes: false, overwrite: false };
+
+  for (const component of components) {
+    await addComponents(component, options);
+  }
+}
+
 export async function addLayout(name: string, options: AddOptions) {
   const spinner = logger.spinner(`Adding layout: ${name}`);
 
@@ -88,6 +102,8 @@ export async function addLayout(name: string, options: AddOptions) {
         `Provider "${provider}" not found for layout "${name}"`
       );
     }
+
+    await handleComponentDependencies(providerConfig.dependenciesComponent);
 
     const templatesRoot = path.join(__dirname, "../src/templates/layout");
     const layoutSourceDir = path.join(templatesRoot, name, provider);
