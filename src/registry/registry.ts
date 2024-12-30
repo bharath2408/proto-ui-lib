@@ -4,13 +4,9 @@ export const REGISTRY: Record<string, ComponentConfig> = {
   button: {
     name: "button",
     type: "components:ui",
-    dependenciesComponent: [],
+    dependenciesComponent: ["slot"],
     files: [{ file_name: "button.tsx", path: "/components/ui" }],
-    dependencies: [
-      "@radix-ui/react-slot@latest",
-      "class-variance-authority@latest",
-      "lucide-react@latest",
-    ],
+    dependencies: ["class-variance-authority@latest", "lucide-react@latest"],
   },
   input: {
     name: "input",
@@ -57,11 +53,15 @@ export const REGISTRY: Record<string, ComponentConfig> = {
     ],
     files: [{ file_name: "label.tsx", path: "/components/ui" }],
   },
-  sidebar: {
-    name: "sidebar",
+  slot: {
+    name: "slot",
     type: "components:ui",
     dependenciesComponent: [],
-    dependencies: ["lucide-react@latest", "class-variance-authority"],
-    files: [{ file_name: "sidebar.tsx", path: "/components/ui" }],
+    dependencies: [
+      "clsx@latest",
+      "tailwind-merge@latest",
+      "class-variance-authority",
+    ],
+    files: [{ file_name: "slot.tsx", path: "/components/ui" }],
   },
 };
