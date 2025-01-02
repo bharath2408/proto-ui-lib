@@ -1,162 +1,161 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import React from "react";
+import * as React from "react";
 
-interface BentoGridItemProps {
-  className?: string;
-  title?: string;
-  description?: string;
-  header?: React.ReactNode;
-  icon?: React.ReactNode;
-  children?: React.ReactNode;
-}
+// Base BentoGrid component
+const BentoGrid = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "grid grid-cols-1 gap-4",
+      "auto-rows-[180px] sm:auto-rows-[200px] md:auto-rows-[220px] lg:auto-rows-[250px]",
+      "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+      "p-4 sm:p-6 md:p-8",
+      className
+    )}
+    {...props}
+  />
+));
+BentoGrid.displayName = "BentoGrid";
 
-const BentoGridItem = ({
-  className,
-  title,
-  description,
-  header,
-  icon,
-  children,
-}: BentoGridItemProps) => {
+// Base BentoItem component
+const BentoItem = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    size?: "sm" | "md" | "lg" | "xl";
+    accentColor?: string;
+    backgroundImage?: string;
+  }
+>(({ className, size = "sm", accentColor, backgroundImage, ...props }, ref) => {
+  const sizeClasses = {
+    sm: "col-span-1",
+    md: "col-span-1 sm:col-span-2",
+    lg: "col-span-1 sm:col-span-2 xl:col-span-3",
+    xl: "col-span-1 sm:col-span-2 xl:col-span-4",
+  };
+
   return (
     <div
+      ref={ref}
       className={cn(
         "rounded-xl border border-gray-200 bg-white p-4",
-        "hover:shadow-lg transition duration-200",
-        "dark:bg-gray-800 dark:border-gray-700",
+        "hover:shadow-xl hover:scale-[1.02] transition-all duration-300",
+        "dark:bg-gray-800/50 dark:border-gray-700",
         "group/bento relative overflow-hidden h-full",
+        "backdrop-blur-sm backdrop-filter",
+        sizeClasses[size],
         className
       )}
+      style={{
+        background: backgroundImage ? `url(${backgroundImage})` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+      {...props}
     >
-      {header}
-      <div className="flex flex-col h-full justify-between">
-        {(title || icon) && (
-          <div className="flex items-center gap-3">
-            {icon && <div className="flex-shrink-0">{icon}</div>}
-            {title && (
-              <h3 className="font-semibold text-lg tracking-tight text-gray-900 dark:text-gray-100">
-                {title}
-              </h3>
-            )}
-          </div>
-        )}
-        {description && (
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
-            {description}
-          </p>
-        )}
-        {children}
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/10 dark:to-black/20 pointer-events-none" />
+      <div className="absolute inset-0 opacity-5 bg-grid-white/10 pointer-events-none" />
+      <div className="relative z-10 h-full">{props.children}</div>
     </div>
   );
+});
+BentoItem.displayName = "BentoItem";
+
+// BentoHeader component
+const BentoHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "flex items-center gap-3 group-hover/bento:translate-x-1 transition-transform duration-300",
+      className
+    )}
+    {...props}
+  />
+));
+BentoHeader.displayName = "BentoHeader";
+
+// BentoIcon component
+const BentoIcon = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & {
+    accentColor?: string;
+  }
+>(({ className, accentColor, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center",
+      "bg-gradient-to-br shadow-inner",
+      "group-hover/bento:shadow-lg transition-all duration-300",
+      accentColor || "from-blue-500 to-blue-600",
+      className
+    )}
+    {...props}
+  />
+));
+BentoIcon.displayName = "BentoIcon";
+
+// BentoTitle component
+const BentoTitle = React.forwardRef<
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h3
+    ref={ref}
+    className={cn(
+      "font-bold text-lg tracking-tight text-gray-900 dark:text-gray-100",
+      className
+    )}
+    {...props}
+  />
+));
+BentoTitle.displayName = "BentoTitle";
+
+// BentoDescription component
+const BentoDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <p
+    ref={ref}
+    className={cn(
+      "text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed",
+      className
+    )}
+    {...props}
+  />
+));
+BentoDescription.displayName = "BentoDescription";
+
+// BentoContent component
+const BentoContent = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn(
+      "mt-4 group-hover/bento:translate-y-[-2px] transition-transform duration-300",
+      className
+    )}
+    {...props}
+  />
+));
+BentoContent.displayName = "BentoContent";
+
+export {
+  BentoContent,
+  BentoDescription,
+  BentoGrid,
+  BentoHeader,
+  BentoIcon,
+  BentoItem,
+  BentoTitle,
 };
-
-interface BentoGridProps {
-  className?: string;
-  children?: React.ReactNode;
-}
-
-const BentoGrid = ({ className, children }: BentoGridProps) => {
-  return (
-    <div
-      className={cn(
-        "grid grid-cols-1 auto-rows-[200px] gap-4 md:auto-rows-[220px]",
-        "md:grid-cols-2 lg:grid-cols-3",
-        className
-      )}
-    >
-      {children}
-    </div>
-  );
-};
-
-const BentoGridDemo = () => {
-  return (
-    <div className="p-4 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      <BentoGrid className="max-w-7xl mx-auto">
-        {/* Featured Item */}
-        <BentoGridItem
-          className="md:col-span-2"
-          title="Featured Content"
-          description="This is a featured item that spans two columns on larger screens."
-          icon={
-            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
-              F
-            </div>
-          }
-        />
-
-        {/* Analytics */}
-        <BentoGridItem
-          title="Analytics"
-          description="Track your performance metrics"
-          icon={
-            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white">
-              A
-            </div>
-          }
-        />
-
-        {/* Reports */}
-        <BentoGridItem
-          title="Reports"
-          description="Generate detailed insights"
-          icon={
-            <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white">
-              R
-            </div>
-          }
-        />
-
-        {/* Dashboard Overview */}
-        <BentoGridItem
-          className="md:col-span-2 lg:col-span-2"
-          title="Dashboard Overview"
-          description="Get a birds-eye view of your entire system"
-          icon={
-            <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center text-white">
-              D
-            </div>
-          }
-        />
-
-        {/* Settings */}
-        <BentoGridItem
-          title="Settings"
-          description="Configure your preferences"
-          icon={
-            <div className="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center text-white">
-              S
-            </div>
-          }
-        />
-
-        {/* Notifications */}
-        <BentoGridItem
-          title="Notifications"
-          description="Stay updated with alerts"
-          icon={
-            <div className="w-10 h-10 rounded-full bg-pink-500 flex items-center justify-center text-white">
-              N
-            </div>
-          }
-        />
-
-        {/* Support */}
-        <BentoGridItem
-          title="Support"
-          description="Get help when you need it"
-          icon={
-            <div className="w-10 h-10 rounded-full bg-teal-500 flex items-center justify-center text-white">
-              S
-            </div>
-          }
-        />
-      </BentoGrid>
-    </div>
-  );
-};
-
-export { BentoGrid, BentoGridDemo, BentoGridItem };

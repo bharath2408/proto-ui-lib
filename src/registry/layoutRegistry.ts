@@ -7,7 +7,7 @@ export const LAYOUTREGISTRY: Record<string, LayoutConfig> = {
     providers: {
       simple: {
         components: [{ file_name: "page.tsx", path: "/" }],
-        dependenciesComponent: ["button", "input"],
+        dependenciesComponent: ["button", "input", "card", "checkbox", "label"],
         dependencies: [
           "@radix-ui/react-slot@latest",
           "class-variance-authority@latest",

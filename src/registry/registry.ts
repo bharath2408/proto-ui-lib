@@ -64,4 +64,29 @@ export const REGISTRY: Record<string, ComponentConfig> = {
     ],
     files: [{ file_name: "slot.tsx", path: "/components/ui" }],
   },
+  breadcrumb: {
+    name: "breadcrumb",
+    type: "components:ui",
+    dependenciesComponent: ["slot"],
+    files: [{ file_name: "breadcrumb.tsx", path: "/components/ui" }],
+    dependencies: [
+      "class-variance-authority@latest",
+      "clsx@latest",
+      "tailwind-merge@latest",
+      "lucide-react@latest",
+    ],
+  },
+  dropdown: {
+    name: "dropdown",
+    type: "components:ui",
+    dependenciesComponent: [],
+    files: [{ file_name: "dropdown-menu.tsx", path: "/components/ui" }],
+    dependencies: [
+      "class-variance-authority@latest",
+      "clsx@latest",
+      "@radix-ui/react-dropdown-menu@latest",
+      "tailwind-merge@latest",
+      "lucide-react@latest",
+    ],
+  },
 };
