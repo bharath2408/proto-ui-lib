@@ -4,7 +4,7 @@ import { add } from "./commands/add";
 import { addComponents } from "./commands/addComponents";
 import { addLayout } from "./commands/addLayout";
 import { init } from "./commands/init";
-import { studio } from "./commands/studio";
+import { startStudio } from "./commands/studio";
 import checkInitialization from "./utils/checkInitialization";
 import { logger } from "./utils/logger";
 
@@ -58,9 +58,7 @@ async function main() {
     .command("studio")
     .description("Start the Studio UI")
     .option("-p, --port <port>", "Specify a port", "3000")
-    .action(async (options) => {
-      await studio(options.port);
-    });
+    .action(async (options) => await startStudio(options.port));
 
   program.parse();
 }
