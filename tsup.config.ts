@@ -9,4 +9,5 @@ export default defineConfig({
   minify: true,
   target: "node18",
   outDir: "dist",
+  external: ["studio-ui"],
 });
