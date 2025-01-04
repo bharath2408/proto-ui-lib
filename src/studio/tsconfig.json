@@ -1,7 +1,16 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["../*"],
+      "@/lib/*": ["../lib/*"],
+      "@/templates/*": ["../templates/*"],
+      "@/components/*": ["../templates/components/*"]
     }
-  }
+  },
+  "include": ["."]
 }

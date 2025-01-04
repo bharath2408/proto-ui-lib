@@ -21,7 +21,10 @@ export async function startStudio(port: string): Promise<void> {
       },
       resolve: {
         alias: {
-          "@/components": path.resolve(__dirname, "../components"),
+          "@/components": path.resolve(
+            __dirname,
+            "../src/templates/components"
+          ),
           "@/templates": path.resolve(__dirname, "../src/templates"),
           "@/utils": path.resolve(__dirname, "../src/utils"),
           "@/lib": path.resolve(__dirname, "../src/lib"),
